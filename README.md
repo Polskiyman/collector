@@ -9,4 +9,4 @@
 
 # Примерная схема реализации
 
-![](../../../Desktop/схема.jpg)
+![Иллюстрация к проекту](https://github.com/Polskiyman/collector/blob/issue-1/схема.jpg)
