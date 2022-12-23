@@ -9,4 +9,4 @@
 
 # Примерная схема реализации
 
-![Иллюстрация к проекту](https://github.com/Polskiyman/collector/blob/issue-1/схема.jpg)
+![Иллюстрация к проекту](https://github.com/Polskiyman/collector/blob/main/схема.jpg)
