@@ -39,9 +39,7 @@ func TestSms_Parse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &Sms{
-				Data: make([]SMSData, 0),
-			}
+			s := New(tt.path)
 
 			err := s.Parse()
 
