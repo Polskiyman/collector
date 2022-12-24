@@ -43,9 +43,8 @@ func TestSms_Parse(t *testing.T) {
 
 			err := s.Parse()
 
-			assert.Len(t, s.Data, 2)
-			assert.Equal(t, s.Data, tt.wantData)
-			assert.Equal(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantData, s.Data)
+			assert.Equal(t, tt.wantErr, err)
 		})
 	}
 }
