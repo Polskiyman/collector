@@ -70,7 +70,7 @@ func Test_createSMSData(t *testing.T) {
 			wantErr: errEmptyLine,
 		},
 		{
-			name: "Ok line",
+			name: "ok line",
 			data: []string{"US;36;1576;Rond"},
 			wantRes: SMSData{
 
