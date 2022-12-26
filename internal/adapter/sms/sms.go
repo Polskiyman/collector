@@ -1,21 +1,22 @@
 package sms
 
 import (
-	"collector/pkg/country"
-	"collector/pkg/provider"
 	"encoding/csv"
 	"fmt"
 	"io"
 	"os"
 	"strings"
+
+	"collector/pkg/country"
+	"collector/pkg/provider"
 )
 
 var (
-	errBadPath   = fmt.Errorf("bad file path")
-	errLenFields = fmt.Errorf("line not contains 4 fields")
-	errEmptyLine = fmt.Errorf("line is empty")
-	errCountry   = fmt.Errorf("incorrect country code")
-	errProvider  = fmt.Errorf("incorrect provider")
+	errBadPath         = fmt.Errorf("bad file path")
+	errLenFields       = fmt.Errorf("line not contains 4 fields")
+	errEmptyLine       = fmt.Errorf("line is empty")
+	errInvalidCountry  = fmt.Errorf("incorrect country code")
+	errInvalidProvider = fmt.Errorf("incorrect provider")
 )
 
 // Sms TODO: think more about naming
@@ -83,14 +84,14 @@ func createSMSData(line []string) (res SMSData, err error) {
 	}
 
 	ok := country.IsValid(fields[0])
-	if ok != true {
-		err = errCountry
+	if !ok {
+		err = errInvalidCountry
 		return
 	}
 
 	ok = provider.IsValid(fields[3])
-	if ok != true {
-		err = errProvider
+	if !ok {
+		err = errInvalidProvider
 		return
 	}
 
