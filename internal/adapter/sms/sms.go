@@ -1,6 +1,8 @@
 package sms
 
 import (
+	"collector/pkg/country"
+	"collector/pkg/provider"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -11,6 +13,9 @@ import (
 var (
 	errBadPath   = fmt.Errorf("bad file path")
 	errLenFields = fmt.Errorf("line not contains 4 fields")
+	errEmptyLine = fmt.Errorf("line is empty")
+	errCountry   = fmt.Errorf("incorrect country code")
+	errProvider  = fmt.Errorf("incorrect provider")
 )
 
 // Sms TODO: think more about naming
@@ -34,17 +39,14 @@ func New(path string) *Sms {
 }
 
 func (s *Sms) Parse() error {
-	// open file
 	f, err := os.Open(s.Path)
 	if err != nil {
 		fmt.Println(errBadPath, err)
 		return errBadPath
 	}
 
-	// remember to close the file at the end of the program
 	defer f.Close()
 
-	// read csv values using csv.Reader
 	csvReader := csv.NewReader(f)
 	for {
 		rec, err := csvReader.Read()
@@ -56,7 +58,6 @@ func (s *Sms) Parse() error {
 			return errBadPath
 		}
 
-		// do something with read line
 		d, err := createSMSData(rec)
 		if err != nil {
 			fmt.Println(err)
@@ -69,13 +70,27 @@ func (s *Sms) Parse() error {
 	return nil
 }
 
-// TODO: типизировать все ошибки при обработке полей строки файлы (см errBadPath = fmt.Errorf("bad file path")
 func createSMSData(line []string) (res SMSData, err error) {
-	// TODO: check len of line
+	if len(line) < 1 {
+		err = errEmptyLine
+		return
+	}
 	fields := strings.Split(line[0], ";")
 
 	if len(fields) != 4 {
 		err = errLenFields
+		return
+	}
+
+	ok := country.IsValid(fields[0])
+	if ok != true {
+		err = errCountry
+		return
+	}
+
+	ok = provider.IsValid(fields[3])
+	if ok != true {
+		err = errProvider
 		return
 	}
 
