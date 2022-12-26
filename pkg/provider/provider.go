@@ -1,9 +1,12 @@
 package provider
 
 var providerMap = map[string]struct{}{
-	"Topolo": {},
-	"Rond":   {},
-	"Kildy":  {},
+	"Topolo":           {},
+	"Rond":             {},
+	"Kildy":            {},
+	"TransparentCalls": {},
+	"E-Voice":          {},
+	"JustPhone":        {},
 }
 
 func IsValid(provider string) bool {
