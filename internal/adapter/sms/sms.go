@@ -12,11 +12,10 @@ import (
 )
 
 var (
-	errBadPath         = fmt.Errorf("bad file path")
-	errLenFields       = fmt.Errorf("line not contains 4 fields")
-	errEmptyLine       = fmt.Errorf("line is empty")
-	errInvalidCountry  = fmt.Errorf("incorrect country code")
-	errInvalidProvider = fmt.Errorf("incorrect provider")
+	errBadPath        = fmt.Errorf("bad file path")
+	errLenFields      = fmt.Errorf("line not contains 4 fields")
+	errEmptyLine      = fmt.Errorf("line is empty")
+	errInvalidCountry = fmt.Errorf("incorrect country code")
 )
 
 // Sms TODO: think more about naming
@@ -83,15 +82,13 @@ func createSMSData(line []string) (res SMSData, err error) {
 		return
 	}
 
-	ok := country.IsValid(fields[0])
-	if !ok {
-		err = errInvalidCountry
+	err = country.IsValid(fields[0])
+	if err != nil {
 		return
 	}
 
-	ok = provider.IsValid(fields[3])
-	if !ok {
-		err = errInvalidProvider
+	err = provider.IsValidSmaProvider(fields[3])
+	if err != nil {
 		return
 	}
 

@@ -13,17 +13,16 @@ import (
 )
 
 var (
-	errBadPath         = fmt.Errorf("bad file path")
-	errLenFields       = fmt.Errorf("line not contains 8 fields")
-	errEmptyLine       = fmt.Errorf("line is empty")
-	errInvalidCountry  = fmt.Errorf("incorrect country code")
-	errInvalidProvider = fmt.Errorf("incorrect provider")
+	errBadPath   = fmt.Errorf("bad file path")
+	errLenFields = fmt.Errorf("line not contains 8 fields")
+	errEmptyLine = fmt.Errorf("line is empty")
 )
 
 type VoiceCall struct {
 	Data []VoiceCallData
 	Path string
 }
+
 type VoiceCallData struct {
 	Country             string
 	Bandwidth           string
@@ -86,21 +85,32 @@ func createVoiceCallData(line []string) (res VoiceCallData, err error) {
 		return
 	}
 
-	ok := country.IsValid(fields[0])
-	if !ok {
-		err = errInvalidCountry
+	err = country.IsValid(fields[0])
+	if err != nil {
 		return
 	}
 
-	ok = provider.IsValid(fields[3])
-	if !ok {
-		err = errInvalidProvider
+	err = provider.IsValidProviderVoiceCall(fields[3])
+	if err != nil {
 		return
 	}
+
 	connectionStability, err := strconv.ParseFloat(fields[4], 32)
+	if err != nil {
+		return
+	}
 	ttfb, err := strconv.Atoi(fields[5])
+	if err != nil {
+		return
+	}
 	voicePurity, err := strconv.Atoi(fields[6])
+	if err != nil {
+		return
+	}
 	medianOfCallsTime, err := strconv.Atoi(fields[7])
+	if err != nil {
+		return
+	}
 
 	res = VoiceCallData{
 		Country:             fields[0],

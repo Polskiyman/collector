@@ -1,5 +1,7 @@
 package country
 
+import "fmt"
+
 var countryMap = map[string]struct{}{
 	"AD": {},
 	"AE": {},
@@ -252,7 +254,12 @@ var countryMap = map[string]struct{}{
 	"ZW": {},
 }
 
-func IsValid(code string) bool {
-	_, ok := countryMap[code]
-	return ok
+var errInvalidCountry = fmt.Errorf("incorrect country code")
+
+func IsValid(code string) (err error) {
+	if _, ok := countryMap[code]; !ok {
+		err = errInvalidCountry
+		return err
+	}
+	return nil
 }
