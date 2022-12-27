@@ -3,10 +3,10 @@ package sms
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"collector/pkg/country"
 	"collector/pkg/provider"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestSms_Parse(t *testing.T) {
