@@ -28,7 +28,7 @@ type VoiceCallData struct {
 	Bandwidth           string
 	ResponseTime        string
 	Provider            string
-	ConnectionStability float64
+	ConnectionStability float32
 	TTFB                int
 	VoicePurity         int
 	MedianOfCallsTime   int
@@ -99,18 +99,22 @@ func createVoiceCallData(line []string) (res VoiceCallData, err error) {
 
 	connectionStability, err := strconv.ParseFloat(fields[4], 32)
 	if err != nil {
+		err = fmt.Errorf("can't parse ConnectionStability field, field[4]=%s, err: %s", fields[4], err.Error())
 		return
 	}
 	ttfb, err := strconv.Atoi(fields[5])
 	if err != nil {
+		err = fmt.Errorf("can't parse TTFB field, field[5]=%s, err: %s", fields[5], err.Error())
 		return
 	}
 	voicePurity, err := strconv.Atoi(fields[6])
 	if err != nil {
+		err = fmt.Errorf("can't parse VoicePurity field, field[6]=%s, err: %s", fields[6], err.Error())
 		return
 	}
 	medianOfCallsTime, err := strconv.Atoi(fields[7])
 	if err != nil {
+		err = fmt.Errorf("can't parse MedianOfCallsTime field, field[7]=%s, err: %s", fields[7], err.Error())
 		return
 	}
 
@@ -119,7 +123,7 @@ func createVoiceCallData(line []string) (res VoiceCallData, err error) {
 		Bandwidth:           fields[1],
 		ResponseTime:        fields[2],
 		Provider:            fields[3],
-		ConnectionStability: connectionStability,
+		ConnectionStability: float32(connectionStability),
 		TTFB:                ttfb,
 		VoicePurity:         voicePurity,
 		MedianOfCallsTime:   medianOfCallsTime,
