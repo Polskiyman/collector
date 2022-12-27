@@ -3,6 +3,9 @@ package sms
 import (
 	"testing"
 
+	"collector/pkg/country"
+	"collector/pkg/provider"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -85,13 +88,13 @@ func Test_createSMSData(t *testing.T) {
 			name:    "incorrect country code",
 			data:    []string{"F2;9;484;Topolo"},
 			wantRes: SMSData{},
-			wantErr: errInvalidCountry,
+			wantErr: country.ErrInvalidCountry,
 		},
 		{
 			name:    "incorrect provider",
 			data:    []string{"US;36;1576;Rondsd"},
 			wantRes: SMSData{},
-			wantErr: errInvalidProvider,
+			wantErr: provider.ErrInvalidProvider,
 		},
 	}
 	for _, tt := range tests {

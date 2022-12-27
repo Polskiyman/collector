@@ -28,7 +28,7 @@ type VoiceCallData struct {
 	Bandwidth           string
 	ResponseTime        string
 	Provider            string
-	ConnectionStability float32
+	ConnectionStability float64
 	TTFB                int
 	VoicePurity         int
 	MedianOfCallsTime   int
@@ -85,13 +85,15 @@ func createVoiceCallData(line []string) (res VoiceCallData, err error) {
 		return
 	}
 
-	err = country.IsValid(fields[0])
-	if err != nil {
+	ok := country.IsValid(fields[0])
+	if !ok {
+		err = country.ErrInvalidCountry
 		return
 	}
 
-	err = provider.IsValidProviderVoiceCall(fields[3])
-	if err != nil {
+	ok = provider.IsValidProviderVoiceCall(fields[3])
+	if !ok {
+		err = provider.ErrInvalidProvider
 		return
 	}
 
@@ -117,7 +119,7 @@ func createVoiceCallData(line []string) (res VoiceCallData, err error) {
 		Bandwidth:           fields[1],
 		ResponseTime:        fields[2],
 		Provider:            fields[3],
-		ConnectionStability: float32(connectionStability),
+		ConnectionStability: connectionStability,
 		TTFB:                ttfb,
 		VoicePurity:         voicePurity,
 		MedianOfCallsTime:   medianOfCallsTime,

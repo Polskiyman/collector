@@ -3,6 +3,9 @@ package voiceCall
 import (
 	"testing"
 
+	"collector/pkg/country"
+	"collector/pkg/provider"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +18,7 @@ func TestVoiceCall_Parse(t *testing.T) {
 	}{
 		{
 			name: "example from task",
-			path: "test_voiceCall.data",
+			path: "test_voice_call.data",
 			wantData: []VoiceCallData{
 				{
 					Country:             "BG",
@@ -96,13 +99,13 @@ func Test_createVoiceCallData(t *testing.T) {
 			name:    "incorrect country code",
 			data:    []string{"B1;40;609;E-Voice;0.86;160;36;5"},
 			wantRes: VoiceCallData{},
-			wantErr: errInvalidCountry,
+			wantErr: country.ErrInvalidCountry,
 		},
 		{
 			name:    "incorrect provider",
 			data:    []string{"BL;58;930;E-Voic;0.65;738;83;52"},
 			wantRes: VoiceCallData{},
-			wantErr: errInvalidProvider,
+			wantErr: provider.ErrInvalidProvider,
 		},
 	}
 	for _, tt := range tests {
