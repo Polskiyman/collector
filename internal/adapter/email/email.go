@@ -1,10 +1,11 @@
-package sms
+package email
 
 import (
 	"encoding/csv"
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 
 	"collector/pkg/country"
@@ -13,30 +14,29 @@ import (
 
 var (
 	errBadPath   = fmt.Errorf("bad file path")
-	errLenFields = fmt.Errorf("line not contains 4 fields")
+	errLenFields = fmt.Errorf("line not contains 3 fields")
 	errEmptyLine = fmt.Errorf("line is empty")
 )
 
-type Sms struct {
-	Data []SMSData
+type Email struct {
+	Data []EmailData
 	Path string
 }
 
-type SMSData struct {
+type EmailData struct {
 	Country      string
-	Bandwidth    string
-	ResponseTime string
 	Provider     string
+	DeliveryTime int
 }
 
-func New(path string) *Sms {
-	return &Sms{
-		Data: make([]SMSData, 0),
+func New(path string) *Email {
+	return &Email{
+		Data: make([]EmailData, 0),
 		Path: path,
 	}
 }
 
-func (s *Sms) Parse() error {
+func (s *Email) Parse() error {
 	f, err := os.Open(s.Path)
 	if err != nil {
 		fmt.Println(errBadPath, err)
@@ -56,7 +56,7 @@ func (s *Sms) Parse() error {
 			return errBadPath
 		}
 
-		d, err := createSMSData(rec)
+		d, err := createEmailData(rec)
 		if err != nil {
 			fmt.Println(err)
 			continue
@@ -68,14 +68,14 @@ func (s *Sms) Parse() error {
 	return nil
 }
 
-func createSMSData(line []string) (res SMSData, err error) {
+func createEmailData(line []string) (res EmailData, err error) {
 	if len(line) < 1 {
 		err = errEmptyLine
 		return
 	}
 	fields := strings.Split(line[0], ";")
 
-	if len(fields) != 4 {
+	if len(fields) != 3 {
 		err = errLenFields
 		return
 	}
@@ -86,17 +86,20 @@ func createSMSData(line []string) (res SMSData, err error) {
 		return
 	}
 
-	ok = provider.IsValidSmaProvider(fields[3])
+	ok = provider.IsValidEmailProvider(fields[1])
 	if !ok {
 		err = provider.ErrInvalidProvider
 		return
 	}
-
-	res = SMSData{
+	deliveryTime, err := strconv.Atoi(fields[2])
+	if err != nil {
+		err = fmt.Errorf("can't parse TTFB field, field[2]=%s, err: %s", fields[2], err.Error())
+		return
+	}
+	res = EmailData{
 		Country:      fields[0],
-		Bandwidth:    fields[1],
-		ResponseTime: fields[2],
-		Provider:     fields[3],
+		Provider:     fields[1],
+		DeliveryTime: deliveryTime,
 	}
 	return
 }
