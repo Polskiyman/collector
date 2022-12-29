@@ -70,7 +70,7 @@ func Test_filterResponse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var data *Mms
+			var data Mms
 			data.Data = make([]MmsData, 0)
 			data.filterResponse(tt.data)
 			assert.Equal(t, tt.wantRes, data.Data)
