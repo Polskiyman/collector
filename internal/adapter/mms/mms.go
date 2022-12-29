@@ -1,9 +1,11 @@
 package mms
 
 import (
+	"collector/pkg/country"
+	"collector/pkg/provider"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -13,8 +15,10 @@ type Mms struct {
 }
 
 type MmsData struct {
-	// TODO: add fields
-	Test int `json:"test"` // TODO: remove
+	Country      string `json:"country"`
+	Provider     string `json:"provider"`
+	Bandwidth    string `json:"bandwidth"`
+	ResponseTime string `json:"response_time"`
 }
 
 func New(url string) *Mms {
@@ -25,46 +29,50 @@ func New(url string) *Mms {
 }
 
 func (m *Mms) Fetch() error {
-	// TODO: create an http client
-
-	// TODO: create an http request
-
-	// TODO: make request and get response
-
-	// TODO: parse response properly - and fill m.Data slice
-
-	return nil
-}
-
-// TODO: remove
-func (m *Mms) TestFunc() (MmsData, error) {
 	url := fmt.Sprintf("%s/data", m.Url)
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return MmsData{}, err
+		return err
 	}
 	request.Header.Add("Accept", "application/json")
 	client := &http.Client{}
 
 	response, err := client.Do(request)
 	if err != nil {
-		return MmsData{}, err
+		return err
 	}
 
 	if response.StatusCode != 200 {
-		return MmsData{}, fmt.Errorf("not success")
+		return fmt.Errorf("not success")
 	}
 
-	content, err := ioutil.ReadAll(response.Body)
+	content, err := io.ReadAll(response.Body)
 	if err != nil {
-		return MmsData{}, err
+		return err
 	}
 
-	v := MmsData{}
-	err = json.Unmarshal(content, &v)
+	data := make([]MmsData, 0)
+	err = json.Unmarshal(content, &data)
 	if err != nil {
-		return MmsData{}, err
+		return err
 	}
-	return v, nil
+
+	m.filterResponse(data)
+
+	return nil
+}
+
+func (m *Mms) filterResponse(data []MmsData) {
+	for _, d := range data {
+		if !country.IsValid(d.Country) {
+			fmt.Println(country.ErrInvalidCountry)
+			continue
+		}
+		if !provider.IsValidMmsProvider(d.Provider) {
+			fmt.Println(country.ErrInvalidCountry)
+			continue
+		}
+		m.Data = append(m.Data, d)
+	}
 }

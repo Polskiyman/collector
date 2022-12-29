@@ -17,6 +17,7 @@ func TestMms_TestFunc(t *testing.T) {
 		}
 
 		w.WriteHeader(http.StatusOK)
+
 		_, _ = w.Write([]byte(`{"test": 2}`))
 	}))
 	defer server.Close()
