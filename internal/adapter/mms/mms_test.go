@@ -23,6 +23,7 @@ func TestMms_Fetch(t *testing.T) {
 
 		w.WriteHeader(http.StatusOK)
 		content, _ := os.ReadFile("mms.json")
+		// TODO: check error
 		_, _ = w.Write(content)
 	}))
 	defer server.Close()
