@@ -93,7 +93,7 @@ func createEmailData(line []string) (res EmailData, err error) {
 	}
 	deliveryTime, err := strconv.Atoi(fields[2])
 	if err != nil {
-		err = fmt.Errorf("can't parse TTFB field, field[2]=%s, err: %s", fields[2], err.Error())
+		err = fmt.Errorf("can't parse DeliveryTime field, field[2]=%s, err: %s", fields[2], err.Error())
 		return
 	}
 	res = EmailData{
