@@ -1,12 +1,13 @@
 package mms
 
 import (
-	"collector/pkg/country"
-	"collector/pkg/provider"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+
+	"collector/pkg/country"
+	"collector/pkg/provider"
 )
 
 type Mms struct {
@@ -29,13 +30,10 @@ func New(url string) *Mms {
 }
 
 func (m *Mms) Fetch() error {
-	url := fmt.Sprintf("%s/data", m.Url)
-
-	request, err := http.NewRequest(http.MethodGet, url, nil)
+	request, err := http.NewRequest(http.MethodGet, m.Url, nil)
 	if err != nil {
 		return err
 	}
-	request.Header.Add("Accept", "application/json")
 	client := &http.Client{}
 
 	response, err := client.Do(request)
@@ -58,7 +56,7 @@ func (m *Mms) Fetch() error {
 		return err
 	}
 
-	data.filterResponse(data.Data)
+	m.filterResponse(data.Data)
 
 	return nil
 }
