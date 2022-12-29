@@ -54,12 +54,6 @@ func Test_filterResponse(t *testing.T) {
 			},
 			wantRes: []MmsData{
 				{
-					Country:      "EN",
-					Provider:     "Topolo",
-					Bandwidth:    "98",
-					ResponseTime: "1920",
-				},
-				{
 					Country:      "RU",
 					Provider:     "Kildy",
 					Bandwidth:    "3",
