@@ -1,6 +1,7 @@
 package mms
 
 import (
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -28,10 +29,51 @@ func TestMms_Fetch(t *testing.T) {
 	if err != nil {
 		t.Errorf(`Expected err nil, got: %v`, err)
 	}
-	if len(m.Data) < 1 {
-		t.Errorf(`Expected m.Date is nil, got: `)
+}
+func Test_filterResponse(t *testing.T) {
+	tests := []struct {
+		name    string
+		data    []MmsData
+		wantRes []MmsData
+	}{
+		{
+			name: "ok line",
+			data: []MmsData{
+				{
+					Country:      "EN",
+					Provider:     "Topolo",
+					Bandwidth:    "98",
+					ResponseTime: "1920",
+				},
+				{
+					Country:      "RU",
+					Provider:     "Kildy",
+					Bandwidth:    "3",
+					ResponseTime: "511",
+				},
+			},
+			wantRes: []MmsData{
+				{
+					Country:      "EN",
+					Provider:     "Topolo",
+					Bandwidth:    "98",
+					ResponseTime: "1920",
+				},
+				{
+					Country:      "RU",
+					Provider:     "Kildy",
+					Bandwidth:    "3",
+					ResponseTime: "511",
+				},
+			},
+		},
 	}
-	if err != nil {
-		t.Errorf(`Expected err nil, got: %v`, err)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var data *Mms
+			data.Data = make([]MmsData, 0)
+			data.filterResponse(tt.data)
+			assert.Equal(t, tt.wantRes, data.Data)
+		})
 	}
 }
