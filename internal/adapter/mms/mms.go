@@ -52,13 +52,13 @@ func (m *Mms) Fetch() error {
 		return err
 	}
 
-	data := make([]MmsData, 0)
+	var data Mms
 	err = json.Unmarshal(content, &data)
 	if err != nil {
 		return err
 	}
 
-	m.filterResponse(data)
+	data.filterResponse(data.Data)
 
 	return nil
 }

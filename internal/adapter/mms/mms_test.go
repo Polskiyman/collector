@@ -3,10 +3,11 @@ package mms
 import (
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
-func TestMms_TestFunc(t *testing.T) {
+func TestMms_Fetch(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/data" {
 			t.Errorf("Expected to request '/data', got: %s", r.URL.Path)
@@ -17,15 +18,18 @@ func TestMms_TestFunc(t *testing.T) {
 		}
 
 		w.WriteHeader(http.StatusOK)
-
-		_, _ = w.Write([]byte(`{"test": 2}`))
+		content, _ := os.ReadFile("mms.json")
+		_, _ = w.Write(content)
 	}))
 	defer server.Close()
 
 	m := New(server.URL)
-	v, err := m.TestFunc()
-	if v.Test != 1 {
-		t.Errorf(`Expected v {Test: 1}, got: %+v`, v)
+	err := m.Fetch()
+	if err != nil {
+		t.Errorf(`Expected err nil, got: %v`, err)
+	}
+	if len(m.Data) < 1 {
+		t.Errorf(`Expected m.Date is nil, got: `)
 	}
 	if err != nil {
 		t.Errorf(`Expected err nil, got: %v`, err)

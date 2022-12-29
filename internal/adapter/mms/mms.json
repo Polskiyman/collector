@@ -1,0 +1,17 @@
+{
+  "Data": [
+    {
+      "country": "EN",
+      "provider": "Topolo",
+      "bandwidth": "98",
+      "response_time": "1920"
+    },
+    {
+      "country": "RU",
+      "provider": "Kildy",
+      "bandwidth": "3",
+      "response_time": "511"
+    }
+  ]
+}
+
