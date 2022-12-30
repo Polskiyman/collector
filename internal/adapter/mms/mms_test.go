@@ -12,12 +12,11 @@ import (
 
 func TestMms_Fetch(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		assert.Equal(t, "/", r.URL.Path)
-
 		assert.Equal(t, http.MethodGet, r.Method)
 
 		w.WriteHeader(http.StatusOK)
+
 		content, err := os.ReadFile("mms.json")
 		assert.Nil(t, err)
 
