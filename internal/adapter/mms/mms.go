@@ -36,13 +36,13 @@ func (m *Mms) Fetch() error {
 		return err
 	}
 
-	var information Mms
-	err = json.Unmarshal(content, &information)
+	var d Mms
+	err = json.Unmarshal(content, &d)
 	if err != nil {
 		return err
 	}
 
-	m.filterResponse(information.Data)
+	m.filterResponse(d.Data)
 
 	return nil
 }

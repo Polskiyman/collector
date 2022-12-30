@@ -16,10 +16,8 @@ func TestMms_Fetch(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 
 		w.WriteHeader(http.StatusOK)
-
 		content, err := os.ReadFile("mms.json")
 		assert.Nil(t, err)
-
 		_, _ = w.Write(content)
 	}))
 	defer server.Close()
@@ -82,13 +80,10 @@ func Test_filterResponse(t *testing.T) {
 
 func TestMms_GetContent(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		assert.Equal(t, "/", r.URL.Path)
-
 		assert.Equal(t, http.MethodGet, r.Method)
 
 		w.WriteHeader(http.StatusInternalServerError)
-
 		_, _ = w.Write(nil)
 	}))
 	defer server.Close()
@@ -96,6 +91,6 @@ func TestMms_GetContent(t *testing.T) {
 	mmsAdapter := New(server.URL)
 	_, err := mmsAdapter.GetContent()
 	errWant := fmt.Errorf("not success")
-	assert.Equal(t, err, errWant)
+	assert.Equal(t, errWant, err)
 
 }
