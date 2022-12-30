@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"collector/pkg/country"
 	"collector/pkg/provider"
@@ -30,22 +31,7 @@ func New(url string) *Mms {
 }
 
 func (m *Mms) Fetch() error {
-	request, err := http.NewRequest(http.MethodGet, m.Url, nil)
-	if err != nil {
-		return err
-	}
-	client := &http.Client{}
-
-	response, err := client.Do(request)
-	if err != nil {
-		return err
-	}
-
-	if response.StatusCode != 200 {
-		return fmt.Errorf("not success")
-	}
-
-	content, err := io.ReadAll(response.Body)
+	content, err := m.GetContent()
 	if err != nil {
 		return err
 	}
@@ -61,6 +47,31 @@ func (m *Mms) Fetch() error {
 	return nil
 }
 
+func (m *Mms) GetContent() ([]byte, error) {
+	request, err := http.NewRequest(http.MethodGet, m.Url, nil)
+	if err != nil {
+		return nil, err
+	}
+	client := &http.Client{
+		Timeout: 20 * time.Second,
+	}
+
+	response, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("not success")
+	}
+
+	content, err := io.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+	return content, nil
+}
+
 func (m *Mms) filterResponse(data []MmsData) {
 	for _, d := range data {
 		if !country.IsValid(d.Country) {
@@ -68,7 +79,7 @@ func (m *Mms) filterResponse(data []MmsData) {
 			continue
 		}
 		if !provider.IsValidMmsProvider(d.Provider) {
-			fmt.Println(country.ErrInvalidCountry)
+			fmt.Println(provider.ErrInvalidProvider)
 			continue
 		}
 		m.Data = append(m.Data, d)

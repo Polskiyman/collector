@@ -1,6 +1,7 @@
 package mms
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -13,17 +14,13 @@ func TestMms_Fetch(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		assert.Equal(t, "/", r.URL.Path)
-		if r.URL.Path != "/" {
-			t.Errorf("Expected to request '/', got: %s", r.URL.Path)
-		}
 
-		if r.Method != http.MethodGet {
-			t.Errorf("Expected method GET '/', got: %s", r.Method)
-		}
+		assert.Equal(t, http.MethodGet, r.Method)
 
 		w.WriteHeader(http.StatusOK)
-		content, _ := os.ReadFile("mms.json")
-		// TODO: check error
+		content, err := os.ReadFile("mms.json")
+		assert.Nil(t, err)
+
 		_, _ = w.Write(content)
 	}))
 	defer server.Close()
@@ -31,9 +28,6 @@ func TestMms_Fetch(t *testing.T) {
 	mmsAdapter := New(server.URL)
 	err := mmsAdapter.Fetch()
 	assert.Nil(t, err)
-	if err != nil {
-		t.Errorf(`Expected err nil, got: %v`, err)
-	}
 
 	expectedData := []MmsData{
 		{
@@ -85,4 +79,24 @@ func Test_filterResponse(t *testing.T) {
 			assert.Equal(t, tt.wantRes, m.Data)
 		})
 	}
+}
+
+func TestMms_GetContent(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		assert.Equal(t, "/", r.URL.Path)
+
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		w.WriteHeader(http.StatusInternalServerError)
+
+		_, _ = w.Write(nil)
+	}))
+	defer server.Close()
+
+	mmsAdapter := New(server.URL)
+	_, err := mmsAdapter.GetContent()
+	errWant := fmt.Errorf("not success")
+	assert.Equal(t, err, errWant)
+
 }
