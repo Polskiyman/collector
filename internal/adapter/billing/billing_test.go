@@ -14,7 +14,7 @@ func TestBilling_Parse(t *testing.T) {
 	}{
 		{
 			name: "BillingParse",
-			data: "billing_data.txt",
+			data: "billing_data_test.txt",
 			wantRes: BillingData{
 				CreateCustomer: true,
 				Purchase:       true,
@@ -30,7 +30,7 @@ func TestBilling_Parse(t *testing.T) {
 			var b Billing
 			b.Path = tt.data
 			err := b.Parse()
-			assert.Nil(t, err, nil)
+			assert.Nil(t, nil, err)
 			assert.Equal(t, tt.wantRes, b.Data)
 		})
 	}
