@@ -1,0 +1,16 @@
+{
+  "data": [
+    {
+      "topic": "Billing isn’t allowed in US",
+      "status": "closed"
+    },
+    {
+      "topic": "Wrong SMS delivery time",
+      "status": "active"
+    },
+    {
+      "topic": "Support overloaded because of EU affect",
+      "status": "active"
+    }
+  ]
+}
