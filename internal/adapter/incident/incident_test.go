@@ -1,14 +1,15 @@
 package incident
 
 import (
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func TestMms_Fetch(t *testing.T) {
+func TestIncident_Fetch(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/", r.URL.Path)
 		assert.Equal(t, http.MethodGet, r.Method)
