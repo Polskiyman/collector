@@ -1,0 +1,16 @@
+{
+  "data": [
+    {
+      "topic": "SMS",
+      "active_tickets": 3
+    },
+    {
+      "topic": "MMS",
+      "active_tickets": 9
+    },
+    {
+      "topic": "Billing",
+      "active_tickets": 0
+    }
+  ]
+}
