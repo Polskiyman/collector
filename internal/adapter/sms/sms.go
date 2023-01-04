@@ -80,7 +80,7 @@ func createSMSData(line []string) (res SMSData, err error) {
 		return
 	}
 
-	ok := country.IsValid(fields[0])
+	_, ok := country.ByCode(fields[0])
 	if !ok {
 		err = country.ErrInvalidCountry
 		return
