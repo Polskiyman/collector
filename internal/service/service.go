@@ -34,47 +34,38 @@ type collector struct {
 	sms *sms.Sms
 }
 
-func NewSms(path string) *collector {
+func New(path string) *collector {
 	return &collector{
 		sms: sms.New(path),
 	}
 }
 
-func (c *collector) GetSystemData() (res ResultT, err error) {
+func (c *collector) GetSystemData() (res ResultT) {
 	res.Data = ResultSetT{
 		SMS: make([][]sms.SMSData, 2),
 	}
+	var err error
 	err = c.sms.Parse()
-	//todo заменить коды стран полными названиями, отсортировать массив по странам  и другой провайдерам
-	sort.Slice(c.sms.Data, func(i, j int) (less bool) {
+	if err != nil {
+		return ResultT{
+			Status: false,
+			Data:   ResultSetT{},
+			Error:  err.Error(),
+		}
+	}
+	sort.SliceStable(c.sms.Data, func(i, j int) bool {
 		return c.sms.Data[i].Country < c.sms.Data[j].Country
 	})
 
 	res.Data.SMS[0] = c.sms.Data
-	sort.Slice(c.sms.Data, func(i, j int) (less bool) {
-		return c.sms.Data[i].Provider < c.sms.Data[j].Provider
-	})
-	res.Data.SMS[1] = c.sms.Data
-	return res, err
-}
 
-//func (c *collector) GetSystemSms() (res ResultT, err error) {
-//	res.Data = ResultSetT{
-//		SMS: make([][]sms.SMSData, 2),
-//	}
-//	err = c.sms.Parse()
-//	if err != nil {
-//		fmt.Println(err)
-//		return ResultT{}, err
-//	}
-//	sort.SliceStable(c.sms.Data, func(i, j int) (less bool) {
-//		return c.sms.Data[i].Country < c.sms.Data[j].Country
-//	})
-//
-//	res.Data.SMS[0] = c.sms.Data
-//	sort.SliceStable(c.sms.Data, func(i, j int) (less bool) {
-//		return c.sms.Data[i].Provider < c.sms.Data[j].Provider
-//	})
-//	res.Data.SMS[1] = c.sms.Data
-//	return res, err
-//}
+	temp := make([]sms.SMSData, 2)
+	copy(temp, c.sms.Data)
+
+	sort.SliceStable(temp, func(i, j int) bool {
+		return temp[i].Provider < temp[j].Provider
+	})
+
+	res.Data.SMS[1] = temp
+	return res
+}
