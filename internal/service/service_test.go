@@ -16,11 +16,11 @@ func Test_collector_GetSystemData(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &collector{}
+			c := NewSms("../adapter/sms/test_sms.data")
 			got, err := c.GetSystemData()
 
-			assert.Equal(t, got, tt.want)
-			assert.Equal(t, err, tt.wantErr)
+			assert.Equal(t, tt.want, got)
+			assert.Equal(t, tt.wantErr, err)
 		})
 	}
 }
