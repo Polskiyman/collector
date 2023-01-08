@@ -74,7 +74,7 @@ func (m *Mms) GetContent() ([]byte, error) {
 
 func (m *Mms) filterResponse(data []MmsData) {
 	for _, d := range data {
-		if !country.IsValid(d.Country) {
+		if _, ok := country.ByCode(d.Country); !ok {
 			fmt.Println(country.ErrInvalidCountry)
 			continue
 		}
