@@ -1,13 +1,14 @@
 package service
 
 import (
+	"sort"
+
 	"collector/internal/adapter/billing"
 	"collector/internal/adapter/email"
 	"collector/internal/adapter/incident"
 	"collector/internal/adapter/mms"
 	"collector/internal/adapter/sms"
 	"collector/internal/adapter/voiceCall"
-	"sort"
 )
 
 type Collector interface {
@@ -42,7 +43,7 @@ func New(path string) *collector {
 
 func (c *collector) GetSystemData() (res ResultT) {
 	res.Data = ResultSetT{
-		SMS: make([][]sms.SMSData, 2),
+		SMS: make([][]sms.SMSData, 2, 2),
 	}
 	var err error
 	err = c.sms.Parse()
@@ -53,19 +54,18 @@ func (c *collector) GetSystemData() (res ResultT) {
 			Error:  err.Error(),
 		}
 	}
-	sort.SliceStable(c.sms.Data, func(i, j int) bool {
-		return c.sms.Data[i].Country < c.sms.Data[j].Country
+
+	res.Data.SMS[0] = append(res.Data.SMS[0], c.sms.Data...)
+
+	sort.SliceStable(res.Data.SMS[0], func(i, j int) bool {
+		return res.Data.SMS[0][i].Country < res.Data.SMS[0][j].Country
 	})
 
-	res.Data.SMS[0] = c.sms.Data
+	res.Data.SMS[1] = append(res.Data.SMS[1], c.sms.Data...)
 
-	temp := make([]sms.SMSData, 2)
-	copy(temp, c.sms.Data)
-
-	sort.SliceStable(temp, func(i, j int) bool {
-		return temp[i].Provider < temp[j].Provider
+	sort.SliceStable(res.Data.SMS[1], func(i, j int) bool {
+		return res.Data.SMS[1][i].Provider < res.Data.SMS[1][j].Provider
 	})
 
-	res.Data.SMS[1] = temp
 	return res
 }
