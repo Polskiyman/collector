@@ -63,7 +63,7 @@ func Test_collector_GetSystemData(t *testing.T) {
 					MMS: [][]mms.MmsData{
 						[]mms.MmsData{
 							mms.MmsData{
-								Country:      "RU",
+								Country:      "Russian Federation (the)",
 								Provider:     "Kildy",
 								Bandwidth:    "3",
 								ResponseTime: "511",
@@ -71,7 +71,7 @@ func Test_collector_GetSystemData(t *testing.T) {
 						},
 						[]mms.MmsData{
 							mms.MmsData{
-								Country:      "RU",
+								Country:      "Russian Federation (the)",
 								Provider:     "Kildy",
 								Bandwidth:    "3",
 								ResponseTime: "511",

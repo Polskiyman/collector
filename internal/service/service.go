@@ -47,6 +47,7 @@ func New(path, mmsUrl string) *collector {
 func (c *collector) GetSystemData() (res ResultT) {
 	res.Data = ResultSetT{
 		SMS: make([][]sms.SMSData, 2, 2),
+		MMS: make([][]mms.MmsData, 2, 2),
 	}
 	var err error
 	err = c.sms.Parse()
