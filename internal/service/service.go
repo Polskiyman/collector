@@ -51,7 +51,7 @@ func (c *collector) GetSystemData() (res ResultT) {
 		MMS: make([][]mms.MmsData, 2, 2),
 	}
 
-	boolChan := make(chan bool, 2)
+	boolChan := make(chan bool, 1)
 	boolChan <- true
 
 	var wg sync.WaitGroup
