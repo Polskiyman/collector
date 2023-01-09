@@ -1,6 +1,7 @@
 package service
 
 import (
+	"collector/pkg/country"
 	"sort"
 
 	"collector/internal/adapter/billing"
@@ -33,11 +34,13 @@ type ResultSetT struct {
 
 type collector struct {
 	sms *sms.Sms
+	mms *mms.Mms
 }
 
-func New(path string) *collector {
+func New(path, mmsUrl string) *collector {
 	return &collector{
 		sms: sms.New(path),
+		mms: mms.New(mmsUrl),
 	}
 }
 
@@ -53,6 +56,12 @@ func (c *collector) GetSystemData() (res ResultT) {
 			Data:   ResultSetT{},
 			Error:  err.Error(),
 		}
+	}
+	// tody c.smc.Data - заменит коды стран на страны
+
+	for i, v := range c.sms.Data {
+		v.Country, _ = country.ByCode(v.Country)
+		c.sms.Data[i] = v
 	}
 
 	res.Data.SMS[0] = append(res.Data.SMS[0], c.sms.Data...)
