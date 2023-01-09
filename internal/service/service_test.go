@@ -60,7 +60,24 @@ func Test_collector_GetSystemData(t *testing.T) {
 								Bandwidth:    "36",
 								ResponseTime: "1576",
 								Provider:     "Rond"}}},
-					MMS:       [][]mms.MmsData(nil),
+					MMS: [][]mms.MmsData{
+						[]mms.MmsData{
+							mms.MmsData{
+								Country:      "RU",
+								Provider:     "Kildy",
+								Bandwidth:    "3",
+								ResponseTime: "511",
+							},
+						},
+						[]mms.MmsData{
+							mms.MmsData{
+								Country:      "RU",
+								Provider:     "Kildy",
+								Bandwidth:    "3",
+								ResponseTime: "511",
+							},
+						},
+					},
 					VoiceCall: []voiceCall.VoiceCallData(nil),
 					Email:     map[string][][]email.EmailData(nil),
 					Billing: billing.BillingData{

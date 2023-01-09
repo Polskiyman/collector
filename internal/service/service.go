@@ -76,5 +76,32 @@ func (c *collector) GetSystemData() (res ResultT) {
 		return res.Data.SMS[1][i].Provider < res.Data.SMS[1][j].Provider
 	})
 
+	err = c.mms.Fetch()
+	if err != nil {
+		return ResultT{
+			Status: false,
+			Data:   ResultSetT{},
+			Error:  err.Error(),
+		}
+	}
+	// tody c.smc.Data - заменит коды стран на страны
+
+	for i, v := range c.mms.Data {
+		v.Country, _ = country.ByCode(v.Country)
+		c.mms.Data[i] = v
+	}
+
+	res.Data.MMS[0] = append(res.Data.MMS[0], c.mms.Data...)
+
+	sort.SliceStable(res.Data.MMS[0], func(i, j int) bool {
+		return res.Data.MMS[0][i].Country < res.Data.MMS[0][j].Country
+	})
+
+	res.Data.MMS[1] = append(res.Data.MMS[1], c.mms.Data...)
+
+	sort.SliceStable(res.Data.MMS[1], func(i, j int) bool {
+		return res.Data.MMS[1][i].Provider < res.Data.MMS[1][j].Provider
+	})
+
 	return res
 }
