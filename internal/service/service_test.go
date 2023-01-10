@@ -78,8 +78,29 @@ func Test_collector_GetSystemData(t *testing.T) {
 							},
 						},
 					},
-					VoiceCall: []voiceCall.VoiceCallData(nil),
-					Email:     map[string][][]email.EmailData(nil),
+					VoiceCall: []voiceCall.VoiceCallData{
+						{
+							Country:             "BG",
+							Bandwidth:           "40",
+							ResponseTime:        "609",
+							Provider:            "E-Voice",
+							ConnectionStability: 0.86,
+							TTFB:                160,
+							VoicePurity:         36,
+							MedianOfCallsTime:   5,
+						},
+						{
+							Country:             "DK",
+							Bandwidth:           "11",
+							ResponseTime:        "743",
+							Provider:            "JustPhone",
+							ConnectionStability: 0.67,
+							TTFB:                82,
+							VoicePurity:         74,
+							MedianOfCallsTime:   41,
+						},
+					},
+					Email: map[string][][]email.EmailData(nil),
 					Billing: billing.BillingData{
 						CreateCustomer: false,
 						Purchase:       false,
@@ -95,7 +116,7 @@ func Test_collector_GetSystemData(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := New("../adapter/sms/test_sms.data", server.URL)
+			c := New("../adapter/sms/test_sms.data", server.URL, "../adapter/voiceCall/test_voice_call.data")
 			got := c.GetSystemData()
 
 			assert.Equal(t, tt.want, got)

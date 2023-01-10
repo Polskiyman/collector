@@ -42,21 +42,24 @@ type ResultSetT struct {
 }
 
 type collector struct {
-	sms *sms.Sms
-	mms *mms.Mms
+	sms       *sms.Sms
+	mms       *mms.Mms
+	voiceCall *voiceCall.VoiceCall
 }
 
-func New(path, mmsUrl string) *collector {
+func New(smsPath, mmsUrl, viceCallPath string) *collector {
 	return &collector{
-		sms: sms.New(path),
-		mms: mms.New(mmsUrl),
+		sms:       sms.New(smsPath),
+		mms:       mms.New(mmsUrl),
+		voiceCall: voiceCall.New(viceCallPath),
 	}
 }
 
 func (c *collector) GetSystemData() (res ResultT) {
 	res.Data = ResultSetT{
-		SMS: make([][]sms.SMSData, 2, 2),
-		MMS: make([][]mms.MmsData, 2, 2),
+		SMS:       make([][]sms.SMSData, 2, 2),
+		MMS:       make([][]mms.MmsData, 2, 2),
+		VoiceCall: make([]voiceCall.VoiceCallData, 0),
 	}
 
 	var wg sync.WaitGroup
@@ -67,9 +70,11 @@ func (c *collector) GetSystemData() (res ResultT) {
 
 	go c.getMmsData(&wg, &res)
 
+	go c.getVoiceCallData(&wg, &res)
+
 	wg.Wait()
 
-	return res
+	return
 }
 
 func (c *collector) getSmsData(wg *sync.WaitGroup, res *ResultT) {
@@ -129,5 +134,22 @@ func (c *collector) getMmsData(wg *sync.WaitGroup, res *ResultT) {
 	sort.SliceStable(res.Data.MMS[1], func(i, j int) bool {
 		return res.Data.MMS[1][i].Provider < res.Data.MMS[1][j].Provider
 	})
+	return
+}
+
+func (c *collector) getVoiceCallData(wg *sync.WaitGroup, res *ResultT) {
+	defer wg.Done()
+
+	if !res.Status {
+		return
+	}
+
+	err := c.voiceCall.Parse()
+	if err != nil {
+		res.statusError(err)
+		return
+	}
+
+	res.Data.VoiceCall = c.voiceCall.Data
 	return
 }
