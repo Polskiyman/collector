@@ -13,7 +13,7 @@ import (
 	"collector/pkg/country"
 )
 
-type Collector interface {
+type CollectorInterface interface {
 	GetSystemData() (string, error)
 }
 
@@ -41,21 +41,21 @@ type ResultSetT struct {
 	Incidents []incident.IncidentData        `json:"incident"`
 }
 
-type collector struct {
+type Collector struct {
 	sms       *sms.Sms
 	mms       *mms.Mms
 	voiceCall *voiceCall.VoiceCall
 }
 
-func New(smsPath, mmsUrl, viceCallPath string) *collector {
-	return &collector{
+func New(smsPath, mmsUrl, viceCallPath string) *Collector {
+	return &Collector{
 		sms:       sms.New(smsPath),
 		mms:       mms.New(mmsUrl),
 		voiceCall: voiceCall.New(viceCallPath),
 	}
 }
 
-func (c *collector) GetSystemData() (res ResultT) {
+func (c *Collector) GetSystemData() (res ResultT) {
 	res.Data = ResultSetT{
 		SMS:       make([][]sms.SMSData, 2, 2),
 		MMS:       make([][]mms.MmsData, 2, 2),
@@ -77,7 +77,7 @@ func (c *collector) GetSystemData() (res ResultT) {
 	return
 }
 
-func (c *collector) getSmsData(wg *sync.WaitGroup, res *ResultT) {
+func (c *Collector) getSmsData(wg *sync.WaitGroup, res *ResultT) {
 	defer wg.Done()
 
 	if !res.Status {
@@ -107,7 +107,7 @@ func (c *collector) getSmsData(wg *sync.WaitGroup, res *ResultT) {
 	return
 }
 
-func (c *collector) getMmsData(wg *sync.WaitGroup, res *ResultT) {
+func (c *Collector) getMmsData(wg *sync.WaitGroup, res *ResultT) {
 	defer wg.Done()
 
 	if !res.Status {
@@ -137,7 +137,7 @@ func (c *collector) getMmsData(wg *sync.WaitGroup, res *ResultT) {
 	return
 }
 
-func (c *collector) getVoiceCallData(wg *sync.WaitGroup, res *ResultT) {
+func (c *Collector) getVoiceCallData(wg *sync.WaitGroup, res *ResultT) {
 	defer wg.Done()
 
 	if !res.Status {
