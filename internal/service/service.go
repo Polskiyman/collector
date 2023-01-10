@@ -51,53 +51,41 @@ func (c *collector) GetSystemData() (res ResultT) {
 		MMS: make([][]mms.MmsData, 2, 2),
 	}
 
-	boolChan := make(chan bool, 1)
-	boolChan <- true
-
 	var wg sync.WaitGroup
 	wg.Add(2)
+	res.Status = true
 
-	go c.getSmsData(&wg, &res, boolChan)
+	go c.getSmsData(&wg, &res)
 
-	go c.getMmsData(&wg, &res, boolChan)
+	go c.getMmsData(&wg, &res)
 
 	wg.Wait()
 
-	ok := <-boolChan
-	if !ok {
-		return ResultT{
-			Status: false,
-			Data:   ResultSetT{},
-			Error:  "Ошибка сбора данных",
-		}
-	}
 	return res
 }
 
-func (c *collector) getSmsData(wg *sync.WaitGroup, res *ResultT, boolChan chan bool) {
+func (c *collector) getSmsData(wg *sync.WaitGroup, res *ResultT) {
 	defer wg.Done()
-	ok := <-boolChan
-	if ok == true {
+	ok := res.Status
+	if ok {
 		err := c.sms.Parse()
 		if err != nil {
-			boolChan <- false
+			res.Status = false
+			res.Error = err.Error()
 			return
 		}
-		boolChan <- true
 
 		for i, v := range c.sms.Data {
 			v.Country, _ = country.ByCode(v.Country)
-			c.sms.Data[i] = v
+			c.sms.Data[i].Country = v.Country
 		}
 
 		res.Data.SMS[0] = append(res.Data.SMS[0], c.sms.Data...)
-
 		sort.SliceStable(res.Data.SMS[0], func(i, j int) bool {
 			return res.Data.SMS[0][i].Country < res.Data.SMS[0][j].Country
 		})
 
 		res.Data.SMS[1] = append(res.Data.SMS[1], c.sms.Data...)
-
 		sort.SliceStable(res.Data.SMS[1], func(i, j int) bool {
 			return res.Data.SMS[1][i].Provider < res.Data.SMS[1][j].Provider
 		})
@@ -106,29 +94,28 @@ func (c *collector) getSmsData(wg *sync.WaitGroup, res *ResultT, boolChan chan b
 	return
 }
 
-func (c *collector) getMmsData(wg *sync.WaitGroup, res *ResultT, boolChan chan bool) {
+func (c *collector) getMmsData(wg *sync.WaitGroup, res *ResultT) {
 	defer wg.Done()
-	ok := <-boolChan
-	if ok == true {
+	ok := res.Status
+	if ok {
 		err := c.mms.Fetch()
 		if err != nil {
-			boolChan <- false
+			res.Status = false
+			res.Error = err.Error()
 			return
 		}
-		boolChan <- true
+
 		for i, v := range c.mms.Data {
 			v.Country, _ = country.ByCode(v.Country)
-			c.mms.Data[i] = v
+			c.mms.Data[i].Country = v.Country
 		}
 
 		res.Data.MMS[0] = append(res.Data.MMS[0], c.mms.Data...)
-
 		sort.SliceStable(res.Data.MMS[0], func(i, j int) bool {
 			return res.Data.MMS[0][i].Country < res.Data.MMS[0][j].Country
 		})
 
 		res.Data.MMS[1] = append(res.Data.MMS[1], c.mms.Data...)
-
 		sort.SliceStable(res.Data.MMS[1], func(i, j int) bool {
 			return res.Data.MMS[1][i].Provider < res.Data.MMS[1][j].Provider
 		})

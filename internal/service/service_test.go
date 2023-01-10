@@ -35,7 +35,7 @@ func Test_collector_GetSystemData(t *testing.T) {
 	}{
 		{name: "simple test",
 			want: ResultT{
-				Status: false,
+				Status: true,
 				Data: ResultSetT{
 					SMS: [][]sms.SMSData{
 						[]sms.SMSData{
