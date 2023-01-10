@@ -116,7 +116,7 @@ func Test_collector_GetSystemData(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := New("../adapter/sms/test_sms.data", server.URL, "../adapter/voiceCall/test_voice_call.data")
+			c := New("../adapter/sms/test_sms.data", server.URL, "../adapter/voiceCall/test_voice_call.data", "../adapter/email/test_email.data")
 			got := c.GetSystemData()
 
 			assert.Equal(t, tt.want, got)

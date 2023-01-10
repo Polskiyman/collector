@@ -45,13 +45,15 @@ type Collector struct {
 	sms       *sms.Sms
 	mms       *mms.Mms
 	voiceCall *voiceCall.VoiceCall
+	email     *email.Email
 }
 
-func New(smsPath, mmsUrl, viceCallPath string) *Collector {
+func New(smsPath, mmsUrl, viceCallPath, emailPath string) *Collector {
 	return &Collector{
 		sms:       sms.New(smsPath),
 		mms:       mms.New(mmsUrl),
 		voiceCall: voiceCall.New(viceCallPath),
+		email:     email.New(emailPath),
 	}
 }
 
@@ -60,10 +62,11 @@ func (c *Collector) GetSystemData() (res ResultT) {
 		SMS:       make([][]sms.SMSData, 2, 2),
 		MMS:       make([][]mms.MmsData, 2, 2),
 		VoiceCall: make([]voiceCall.VoiceCallData, 0),
+		Email:     make(map[string][][]email.EmailData),
 	}
 
 	var wg sync.WaitGroup
-	wg.Add(2)
+	wg.Add(4)
 	res.Status = true
 
 	go c.getSmsData(&wg, &res)
@@ -71,6 +74,8 @@ func (c *Collector) GetSystemData() (res ResultT) {
 	go c.getMmsData(&wg, &res)
 
 	go c.getVoiceCallData(&wg, &res)
+
+	go c.getEmailData(&wg, &res)
 
 	wg.Wait()
 
@@ -151,5 +156,30 @@ func (c *Collector) getVoiceCallData(wg *sync.WaitGroup, res *ResultT) {
 	}
 
 	res.Data.VoiceCall = c.voiceCall.Data
+	return
+}
+
+func (c *Collector) getEmailData(wg *sync.WaitGroup, res *ResultT) {
+	defer wg.Done()
+
+	if !res.Status {
+		return
+	}
+
+	err := c.email.Parse()
+	if err != nil {
+		res.statusError(err)
+		return
+	}
+	var t []email.EmailData
+	t = append(t, c.email.Data...)
+	sort.SliceStable(t, func(i, j int) bool {
+		return t[i].DeliveryTime < t[j].DeliveryTime
+	})
+
+	for i := 0; i <= 3; i++ {
+		res.Data.Email[t[i].Country][0] = append(res.Data.Email[t[i].Country][0], t[i])
+		res.Data.Email[t[len(t)-i-1].Country][1] = append(res.Data.Email[t[len(t)-i-1].Country][1], t[len(t)-i-1])
+	}
 	return
 }
