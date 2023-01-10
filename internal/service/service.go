@@ -13,7 +13,7 @@ import (
 	"collector/pkg/country"
 )
 
-type Collector interface {
+type CollectorInterface interface {
 	GetSystemData() (string, error)
 }
 
@@ -41,22 +41,25 @@ type ResultSetT struct {
 	Incidents []incident.IncidentData        `json:"incident"`
 }
 
-type collector struct {
-	sms *sms.Sms
-	mms *mms.Mms
+type Collector struct {
+	sms       *sms.Sms
+	mms       *mms.Mms
+	voiceCall *voiceCall.VoiceCall
 }
 
-func New(path, mmsUrl string) *collector {
-	return &collector{
-		sms: sms.New(path),
-		mms: mms.New(mmsUrl),
+func New(smsPath, mmsUrl, viceCallPath string) *Collector {
+	return &Collector{
+		sms:       sms.New(smsPath),
+		mms:       mms.New(mmsUrl),
+		voiceCall: voiceCall.New(viceCallPath),
 	}
 }
 
-func (c *collector) GetSystemData() (res ResultT) {
+func (c *Collector) GetSystemData() (res ResultT) {
 	res.Data = ResultSetT{
-		SMS: make([][]sms.SMSData, 2, 2),
-		MMS: make([][]mms.MmsData, 2, 2),
+		SMS:       make([][]sms.SMSData, 2, 2),
+		MMS:       make([][]mms.MmsData, 2, 2),
+		VoiceCall: make([]voiceCall.VoiceCallData, 0),
 	}
 
 	var wg sync.WaitGroup
@@ -67,12 +70,14 @@ func (c *collector) GetSystemData() (res ResultT) {
 
 	go c.getMmsData(&wg, &res)
 
+	go c.getVoiceCallData(&wg, &res)
+
 	wg.Wait()
 
-	return res
+	return
 }
 
-func (c *collector) getSmsData(wg *sync.WaitGroup, res *ResultT) {
+func (c *Collector) getSmsData(wg *sync.WaitGroup, res *ResultT) {
 	defer wg.Done()
 
 	if !res.Status {
@@ -102,7 +107,7 @@ func (c *collector) getSmsData(wg *sync.WaitGroup, res *ResultT) {
 	return
 }
 
-func (c *collector) getMmsData(wg *sync.WaitGroup, res *ResultT) {
+func (c *Collector) getMmsData(wg *sync.WaitGroup, res *ResultT) {
 	defer wg.Done()
 
 	if !res.Status {
@@ -129,5 +134,22 @@ func (c *collector) getMmsData(wg *sync.WaitGroup, res *ResultT) {
 	sort.SliceStable(res.Data.MMS[1], func(i, j int) bool {
 		return res.Data.MMS[1][i].Provider < res.Data.MMS[1][j].Provider
 	})
+	return
+}
+
+func (c *Collector) getVoiceCallData(wg *sync.WaitGroup, res *ResultT) {
+	defer wg.Done()
+
+	if !res.Status {
+		return
+	}
+
+	err := c.voiceCall.Parse()
+	if err != nil {
+		res.statusError(err)
+		return
+	}
+
+	res.Data.VoiceCall = c.voiceCall.Data
 	return
 }
