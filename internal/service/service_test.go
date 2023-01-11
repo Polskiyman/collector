@@ -175,11 +175,11 @@ func Test_collector_GetSystemData(t *testing.T) {
 						},
 					},
 					Billing: billing.BillingData{
-						CreateCustomer: false,
-						Purchase:       false,
+						CreateCustomer: true,
+						Purchase:       true,
 						Payout:         false,
 						Recurring:      false,
-						FraudControl:   false,
+						FraudControl:   true,
 						CheckoutPage:   false,
 					},
 					Support:   []int(nil),
@@ -189,7 +189,7 @@ func Test_collector_GetSystemData(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := New("../adapter/sms/test_sms.data", server.URL, "../adapter/voiceCall/test_voice_call.data", "../adapter/email/test_email.data")
+			c := New("../adapter/sms/test_sms.data", server.URL, "../adapter/voiceCall/test_voice_call.data", "../adapter/email/test_email.data", "../adapter/billing/billing_data_test.txt")
 			got := c.GetSystemData()
 
 			assert.Equal(t, tt.want, got)

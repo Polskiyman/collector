@@ -46,14 +46,16 @@ type Collector struct {
 	mms       *mms.Mms
 	voiceCall *voiceCall.VoiceCall
 	email     *email.Email
+	billing   billing.Billing
 }
 
-func New(smsPath, mmsUrl, viceCallPath, emailPath string) *Collector {
+func New(smsPath, mmsUrl, viceCallPath, emailPath, billingPath string) *Collector {
 	return &Collector{
 		sms:       sms.New(smsPath),
 		mms:       mms.New(mmsUrl),
 		voiceCall: voiceCall.New(viceCallPath),
 		email:     email.New(emailPath),
+		billing:   billing.New(billingPath),
 	}
 }
 
@@ -66,7 +68,7 @@ func (c *Collector) GetSystemData() (res ResultT) {
 	}
 
 	var wg sync.WaitGroup
-	wg.Add(4)
+	wg.Add(5)
 	res.Status = true
 
 	go c.getSmsData(&wg, &res)
@@ -76,6 +78,8 @@ func (c *Collector) GetSystemData() (res ResultT) {
 	go c.getVoiceCallData(&wg, &res)
 
 	go c.getEmailData(&wg, &res)
+
+	go c.getBillingData(&wg, &res)
 
 	wg.Wait()
 
@@ -190,8 +194,23 @@ func (c *Collector) getEmailData(wg *sync.WaitGroup, res *ResultT) {
 		if l < n {
 			n = l
 		}
-		res.Data.Email[i][0] = append(res.Data.Email[i][0][:n])
 		res.Data.Email[i][1] = append(res.Data.Email[i][0][l-n : l])
+		res.Data.Email[i][0] = append(res.Data.Email[i][0][:n])
 	}
+	return
+}
+
+func (c *Collector) getBillingData(wg *sync.WaitGroup, res *ResultT) {
+	defer wg.Done()
+
+	if !res.Status {
+		return
+	}
+	err := c.billing.Parse()
+	if err != nil {
+		res.statusError(err)
+		return
+	}
+	res.Data.Billing = c.billing.Data
 	return
 }
