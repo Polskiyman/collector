@@ -25,8 +25,8 @@ type BillingData struct {
 	CheckoutPage   bool
 }
 
-func New(path string) Billing {
-	return Billing{
+func New(path string) *Billing {
+	return &Billing{
 		Data: BillingData{},
 		Path: path,
 	}

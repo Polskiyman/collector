@@ -46,7 +46,7 @@ type Collector struct {
 	mms       *mms.Mms
 	voiceCall *voiceCall.VoiceCall
 	email     *email.Email
-	billing   billing.Billing
+	billing   *billing.Billing
 }
 
 func New(smsPath, mmsUrl, viceCallPath, emailPath, billingPath string) *Collector {
