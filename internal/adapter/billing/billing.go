@@ -25,6 +25,13 @@ type BillingData struct {
 	CheckoutPage   bool
 }
 
+func New(path string) *Billing {
+	return &Billing{
+		Data: BillingData{},
+		Path: path,
+	}
+}
+
 func (b *Billing) Parse() error {
 	content, err := os.ReadFile(b.Path)
 	if err != nil {
