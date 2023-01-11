@@ -176,10 +176,18 @@ func (c *Collector) getEmailData(wg *sync.WaitGroup, res *ResultT) {
 	sort.SliceStable(t, func(i, j int) bool {
 		return t[i].DeliveryTime < t[j].DeliveryTime
 	})
+	for _, v := range t {
+		_, ok := res.Data.Email[v.Country]
+		if !ok {
+			res.Data.Email[v.Country] = make([][]email.EmailData, 2)
+		}
+		res.Data.Email[v.Country][0] = append(res.Data.Email[v.Country][0], v)
+		res.Data.Email[v.Country][1] = append(res.Data.Email[v.Country][1], v)
+	}
 
-	for i := 0; i <= 3; i++ {
-		res.Data.Email[t[i].Country][0] = append(res.Data.Email[t[i].Country][0], t[i])
-		res.Data.Email[t[len(t)-i-1].Country][1] = append(res.Data.Email[t[len(t)-i-1].Country][1], t[len(t)-i-1])
+	for i, _ := range res.Data.Email {
+		res.Data.Email[i][0] = append(res.Data.Email[i][0][:3])
+		res.Data.Email[i][1] = append(res.Data.Email[i][1][len(res.Data.Email[i][1])-3 : len(res.Data.Email[i][1])])
 	}
 	return
 }

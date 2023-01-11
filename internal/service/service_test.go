@@ -100,7 +100,80 @@ func Test_collector_GetSystemData(t *testing.T) {
 							MedianOfCallsTime:   41,
 						},
 					},
-					Email: map[string][][]email.EmailData(nil),
+					Email: map[string][][]email.EmailData{
+						"RU": [][]email.EmailData{
+							[]email.EmailData{
+								email.EmailData{
+									Country:      "RU",
+									Provider:     "Yahoo",
+									DeliveryTime: 124,
+								},
+								email.EmailData{
+									Country:      "RU",
+									Provider:     "Gmail",
+									DeliveryTime: 428,
+								},
+								email.EmailData{
+									Country:      "RU",
+									Provider:     "MSN",
+									DeliveryTime: 463,
+								},
+							},
+							[]email.EmailData{
+								email.EmailData{
+									Country:      "RU",
+									Provider:     "Gmail",
+									DeliveryTime: 428,
+								},
+								email.EmailData{
+									Country:      "RU",
+									Provider:     "MSN",
+									DeliveryTime: 463,
+								},
+								email.EmailData{
+									Country:      "RU",
+									Provider:     "Hotmail",
+									DeliveryTime: 592,
+								},
+							},
+						},
+						"US": [][]email.EmailData{
+							[]email.EmailData{
+								email.EmailData{
+									Country:      "US",
+									Provider:     "Orange",
+									DeliveryTime: 45,
+								},
+								email.EmailData{
+									Country:      "US",
+									Provider:     "MSN",
+									DeliveryTime: 124,
+								},
+								email.EmailData{
+									Country:      "US",
+									Provider:     "Yahoo",
+									DeliveryTime: 305,
+								},
+							},
+							[]email.EmailData{
+								email.EmailData{
+									Country:      "US",
+									Provider:     "MSN",
+									DeliveryTime: 124,
+								},
+								email.EmailData{
+									Country:      "US",
+									Provider:     "Yahoo",
+									DeliveryTime: 305,
+								},
+								email.EmailData{
+									Country:      "US",
+									Provider:     "Hotmail",
+									DeliveryTime: 391,
+								},
+							},
+						},
+					},
 					Billing: billing.BillingData{
 						CreateCustomer: false,
 						Purchase:       false,
