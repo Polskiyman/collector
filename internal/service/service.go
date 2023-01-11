@@ -182,12 +182,16 @@ func (c *Collector) getEmailData(wg *sync.WaitGroup, res *ResultT) {
 			res.Data.Email[v.Country] = make([][]email.EmailData, 2)
 		}
 		res.Data.Email[v.Country][0] = append(res.Data.Email[v.Country][0], v)
-		res.Data.Email[v.Country][1] = append(res.Data.Email[v.Country][1], v)
 	}
 
 	for i, _ := range res.Data.Email {
-		res.Data.Email[i][0] = append(res.Data.Email[i][0][:3])
-		res.Data.Email[i][1] = append(res.Data.Email[i][1][len(res.Data.Email[i][1])-3 : len(res.Data.Email[i][1])])
+		// can use for both slices, they are equal
+		l, n := len(res.Data.Email[i][0]), 3
+		if l < n {
+			n = l
+		}
+		res.Data.Email[i][0] = append(res.Data.Email[i][0][:n])
+		res.Data.Email[i][1] = append(res.Data.Email[i][0][l-n : l])
 	}
 	return
 }
