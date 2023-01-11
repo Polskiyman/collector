@@ -17,7 +17,7 @@ import (
 )
 
 func Test_collector_GetSystemData(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	serverMms := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/", r.URL.Path)
 		assert.Equal(t, http.MethodGet, r.Method)
 
@@ -26,7 +26,18 @@ func Test_collector_GetSystemData(t *testing.T) {
 		assert.Nil(t, err)
 		_, _ = w.Write(content)
 	}))
-	defer server.Close()
+	defer serverMms.Close()
+
+	serverIncident := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		w.WriteHeader(http.StatusOK)
+		content, err := os.ReadFile("../adapter/incident/incident_data.json")
+		assert.Nil(t, err)
+		_, _ = w.Write(content)
+	}))
+	defer serverIncident.Close()
 
 	tests := []struct {
 		name    string
@@ -182,14 +193,29 @@ func Test_collector_GetSystemData(t *testing.T) {
 						FraudControl:   true,
 						CheckoutPage:   false,
 					},
-					Support:   []int(nil),
-					Incidents: []incident.IncidentData(nil)},
-				Error: ""},
+					Support: []int(nil),
+					Incidents: []incident.IncidentData{
+						{
+							Topic:  "Wrong SMS delivery time",
+							Status: "active",
+						},
+						{
+							Topic:  "Support overloaded because of EU affect",
+							Status: "active",
+						},
+						{
+							Topic:  "Billing isn’t allowed in US",
+							Status: "closed",
+						},
+					},
+				},
+				Error: "",
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := New("../adapter/sms/test_sms.data", server.URL, "../adapter/voiceCall/test_voice_call.data", "../adapter/email/test_email.data", "../adapter/billing/billing_data_test.txt")
+			c := New("../adapter/sms/test_sms.data", serverMms.URL, "../adapter/voiceCall/test_voice_call.data", "../adapter/email/test_email.data", "../adapter/billing/billing_data_test.txt", serverIncident.URL)
 			got := c.GetSystemData()
 
 			assert.Equal(t, tt.want, got)
