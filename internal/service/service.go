@@ -9,6 +9,7 @@ import (
 	"collector/internal/adapter/incident"
 	"collector/internal/adapter/mms"
 	"collector/internal/adapter/sms"
+	"collector/internal/adapter/support"
 	"collector/internal/adapter/voiceCall"
 	"collector/pkg/country"
 )
@@ -48,9 +49,10 @@ type Collector struct {
 	email     *email.Email
 	billing   *billing.Billing
 	incident  *incident.Incident
+	support   *support.Support
 }
 
-func New(smsPath, mmsUrl, viceCallPath, emailPath, billingPath, incidentData string) *Collector {
+func New(smsPath, mmsUrl, viceCallPath, emailPath, billingPath, incidentData, supportPath string) *Collector {
 	return &Collector{
 		sms:       sms.New(smsPath),
 		mms:       mms.New(mmsUrl),
@@ -58,6 +60,7 @@ func New(smsPath, mmsUrl, viceCallPath, emailPath, billingPath, incidentData str
 		email:     email.New(emailPath),
 		billing:   billing.New(billingPath),
 		incident:  incident.New(incidentData),
+		support:   support.New(supportPath),
 	}
 }
 
@@ -68,10 +71,11 @@ func (c *Collector) GetSystemData() (res ResultT) {
 		VoiceCall: make([]voiceCall.VoiceCallData, 0),
 		Email:     make(map[string][][]email.EmailData),
 		Incidents: make([]incident.IncidentData, 0),
+		Support:   make([]int, 2),
 	}
 
 	var wg sync.WaitGroup
-	wg.Add(6)
+	wg.Add(7)
 	res.Status = true
 
 	go c.getSmsData(&wg, &res)
@@ -85,6 +89,8 @@ func (c *Collector) GetSystemData() (res ResultT) {
 	go c.getBillingData(&wg, &res)
 
 	go c.getIncidentData(&wg, &res)
+
+	go c.getSupportData(&wg, &res)
 
 	wg.Wait()
 
@@ -235,5 +241,35 @@ func (c *Collector) getIncidentData(wg *sync.WaitGroup, res *ResultT) {
 		return c.incident.Data[i].Status < c.incident.Data[j].Status
 	})
 	res.Data.Incidents = c.incident.Data
+	return
+}
+
+func (c *Collector) getSupportData(wg *sync.WaitGroup, res *ResultT) {
+	defer wg.Done()
+
+	if !res.Status {
+		return
+	}
+	err := c.support.Fetch()
+	if err != nil {
+		res.statusError(err)
+		return
+	}
+	const amountOfWorkPerHour = 3
+	activTicets := 0
+	load := 1
+	for _, v := range c.support.Data {
+		activTicets += v.ActiveTickets
+	}
+
+	if 9 <= activTicets && activTicets <= 16 {
+		load = 2
+	}
+	if activTicets > 16 {
+		load = 3
+	}
+	res.Data.Support[0] = load
+	waitingTime := activTicets * amountOfWorkPerHour
+	res.Data.Support[1] = waitingTime
 	return
 }
