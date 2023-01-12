@@ -1,46 +1,18 @@
-package controller
+package service
 
 import (
-	"github.com/stretchr/testify@v1.8.1/assert"
-	"io"
-	"net/http"
-	"strings"
-	"testing"
-
-	"github.com/gorilla/mux"
-
-	"collector/internal/app"
-	"collector/internal/service"
+	"collector/internal/adapter/billing"
+	"collector/internal/adapter/email"
+	"collector/internal/adapter/incident"
+	"collector/internal/adapter/mms"
+	"collector/internal/adapter/sms"
+	"collector/internal/adapter/voiceCall"
 )
 
-type request struct {
-	method string
-	path   string
-}
+type Mock struct{}
 
-type want struct {
-	status int
-	body   string
-}
-
-func Test_handleConnection(t *testing.T) {
-	a := app.App{
-		Port:    "127.0.0.1:8380",
-		Router:  mux.NewRouter(),
-		Service: service.Mock{},
-	}
-	go a.Run()
-
-	tests := map[string]struct {
-		request request
-		want    want
-	}{
-		"testHandle": {
-			request{
-				"GET",
-				"/",
-			},
-			want{200, `{
+func (Mock) GetSystemData() (res ResultT) {
+	return ResultT{
 		Status: true,
 		Data: ResultSetT{
 			SMS: [][]sms.SMSData{
@@ -208,28 +180,5 @@ func Test_handleConnection(t *testing.T) {
 			},
 		},
 		Error: "",
-	}`,
-			},
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			client := &http.Client{}
-			r := strings.NewReader("")
-			req, err := http.NewRequest(tc.request.method, tc.request.path, r)
-			if err != nil {
-				t.Fatal(err)
-			}
-			res, err := client.Do(req)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			b, _ := io.ReadAll(res.Body)
-			res.Body.Close()
-
-			assert.Equal(t, tc.want.status, res.StatusCode)
-			assert.Equal(t, tc.want.body, string(b))
-		})
 	}
 }

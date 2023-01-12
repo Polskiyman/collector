@@ -12,23 +12,23 @@ import (
 )
 
 type App struct {
-	port    string
-	router  *mux.Router
-	service service.CollectorInterface
+	Port    string
+	Router  *mux.Router
+	Service service.CollectorInterface
 }
 
 func NewApp(conf pkg.Config) *App {
 	return &App{
-		port:    conf.UrlService,
-		router:  mux.NewRouter(),
-		service: service.New(conf.SmsPath, conf.MmsUrl, conf.VoiceCallPath, conf.EmailPath, conf.BillingPath, conf.IncidentUrl, conf.SupportUrl),
+		Port:    conf.UrlService,
+		Router:  mux.NewRouter(),
+		Service: service.New(conf.SmsPath, conf.MmsUrl, conf.VoiceCallPath, conf.EmailPath, conf.BillingPath, conf.IncidentUrl, conf.SupportUrl),
 	}
 }
 
 func (a *App) Run() {
-	a.router.HandleFunc("/", controller.HandleConnection(a.service))
-	err := http.ListenAndServe(a.port, a.router)
+	a.Router.HandleFunc("/", controller.HandleConnection(a.Service))
+	err := http.ListenAndServe(a.Port, a.Router)
 	if err != nil {
-		fmt.Printf("can't start http service: %s\n", err.Error())
+		fmt.Printf("can't start http Service: %s\n", err.Error())
 	}
 }
