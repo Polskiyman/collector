@@ -1,0 +1,10 @@
+{
+  "port_service": "127.0.0.1:8382",
+  "sms_path": "C:/Users/User/go/src/skillbox-diploma/sms.data",
+  "mms_url":"http://127.0.0.1:8383/mms",
+  "vice_call_path":"C:/Users/User/go/src/skillbox-diploma/voice.data",
+  "email_path":"C:/Users/User/go/src/skillbox-diploma/email.data",
+  "billing_path":"C:/Users/User/go/src/skillbox-diploma/billing.data",
+  "incident_url":"http://127.0.0.1:8383/accendent",
+  "support_url":"http://127.0.0.1:8383/support"
+}

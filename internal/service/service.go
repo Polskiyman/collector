@@ -15,7 +15,7 @@ import (
 )
 
 type CollectorInterface interface {
-	GetSystemData() (string, error)
+	GetSystemData() (res ResultT)
 }
 
 type ResultT struct {
@@ -52,15 +52,15 @@ type Collector struct {
 	support   *support.Support
 }
 
-func New(smsPath, mmsUrl, viceCallPath, emailPath, billingPath, incidentData, supportPath string) *Collector {
+func New(smsPath, mmsUrl, viceCallPath, emailPath, billingPath, incidentUrl, supportUrl string) *Collector {
 	return &Collector{
 		sms:       sms.New(smsPath),
 		mms:       mms.New(mmsUrl),
 		voiceCall: voiceCall.New(viceCallPath),
 		email:     email.New(emailPath),
 		billing:   billing.New(billingPath),
-		incident:  incident.New(incidentData),
-		support:   support.New(supportPath),
+		incident:  incident.New(incidentUrl),
+		support:   support.New(supportUrl),
 	}
 }
 
