@@ -1,15 +1,14 @@
-package controller
+package app
 
 import (
-	"github.com/stretchr/testify@v1.8.1/assert"
 	"io"
 	"net/http"
 	"strings"
 	"testing"
 
 	"github.com/gorilla/mux"
+	"github.com/stretchr/testify/assert"
 
-	"collector/internal/app"
 	"collector/internal/service"
 )
 
@@ -24,8 +23,8 @@ type want struct {
 }
 
 func Test_handleConnection(t *testing.T) {
-	a := app.App{
-		Port:    "127.0.0.1:8380",
+	a := App{
+		Url:     "127.0.0.1:8380",
 		Router:  mux.NewRouter(),
 		Service: service.Mock{},
 	}
@@ -35,7 +34,7 @@ func Test_handleConnection(t *testing.T) {
 		request request
 		want    want
 	}{
-		"testHandle": {
+		"testCollector": {
 			request{
 				"GET",
 				"/",

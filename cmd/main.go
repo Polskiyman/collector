@@ -1,10 +1,10 @@
 package main
 
 import (
-	"collector/pkg"
 	"log"
 
 	"collector/internal/app"
+	"collector/pkg"
 )
 
 const configPath = "config.json"

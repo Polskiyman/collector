@@ -1,6 +1,7 @@
 package service
 
 import (
+	"collector/pkg"
 	"sort"
 	"sync"
 
@@ -52,15 +53,15 @@ type Collector struct {
 	support   *support.Support
 }
 
-func New(smsPath, mmsUrl, viceCallPath, emailPath, billingPath, incidentUrl, supportUrl string) *Collector {
+func New(config pkg.Config) *Collector {
 	return &Collector{
-		sms:       sms.New(smsPath),
-		mms:       mms.New(mmsUrl),
-		voiceCall: voiceCall.New(viceCallPath),
-		email:     email.New(emailPath),
-		billing:   billing.New(billingPath),
-		incident:  incident.New(incidentUrl),
-		support:   support.New(supportUrl),
+		sms:       sms.New(config.SmsPath),
+		mms:       mms.New(config.MmsUrl),
+		voiceCall: voiceCall.New(config.VoiceCallPath),
+		email:     email.New(config.EmailPath),
+		billing:   billing.New(config.BillingPath),
+		incident:  incident.New(config.IncidentUrl),
+		support:   support.New(config.SupportUrl),
 	}
 }
 
