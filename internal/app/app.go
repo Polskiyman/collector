@@ -1,12 +1,12 @@
 package app
 
 import (
+	"collector/pkg"
 	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
 
-	"collector/internal"
 	"collector/internal/controller"
 	"collector/internal/service"
 )
@@ -17,11 +17,11 @@ type App struct {
 	service service.CollectorInterface
 }
 
-func NewApp(conf internal.Config) *App {
+func NewApp(conf pkg.Config) *App {
 	return &App{
-		port:    conf.PortService,
+		port:    conf.UrlService,
 		router:  mux.NewRouter(),
-		service: service.New(conf.SmsPath, conf.MmsUrl, conf.ViceCallPath, conf.EmailPath, conf.BillingPath, conf.IncidentUrl, conf.SupportUrl),
+		service: service.New(conf.SmsPath, conf.MmsUrl, conf.VoiceCallPath, conf.EmailPath, conf.BillingPath, conf.IncidentUrl, conf.SupportUrl),
 	}
 }
 

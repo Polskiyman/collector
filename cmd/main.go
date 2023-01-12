@@ -1,16 +1,16 @@
 package main
 
 import (
+	"collector/pkg"
 	"log"
 
-	"collector/internal"
 	"collector/internal/app"
 )
 
 const configPath = "config.json"
 
 func main() {
-	config, err := internal.ParseFromFile(configPath)
+	config, err := pkg.ParseFromFile(configPath)
 	if err != nil {
 		log.Fatal(err)
 	}

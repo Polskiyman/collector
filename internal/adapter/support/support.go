@@ -31,7 +31,7 @@ func (s *Support) Fetch() error {
 		return err
 	}
 
-	err = json.Unmarshal(content, &s)
+	err = json.Unmarshal(content, &s.Data)
 	if err != nil {
 		return err
 	}

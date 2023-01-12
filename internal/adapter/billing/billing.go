@@ -8,7 +8,7 @@ import (
 var (
 	one           = uint8('1')
 	errBadPath    = fmt.Errorf("bad file path")
-	errLenBilling = fmt.Errorf("not contains 8 bits")
+	errLenBilling = fmt.Errorf("billing file does not contains 8 bits")
 )
 
 type Billing struct {

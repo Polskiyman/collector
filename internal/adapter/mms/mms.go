@@ -37,7 +37,7 @@ func (m *Mms) Fetch() error {
 	}
 
 	var d Mms
-	err = json.Unmarshal(content, &d)
+	err = json.Unmarshal(content, &d.Data)
 	if err != nil {
 		return err
 	}
