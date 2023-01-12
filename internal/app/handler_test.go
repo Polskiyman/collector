@@ -37,7 +37,7 @@ func Test_handleConnection(t *testing.T) {
 		"testCollector": {
 			request{
 				"GET",
-				"/",
+				"http://127.0.0.1:8380/",
 			},
 			want{200, `{
 		Status: true,
