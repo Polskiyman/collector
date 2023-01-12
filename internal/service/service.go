@@ -256,20 +256,20 @@ func (c *Collector) getSupportData(wg *sync.WaitGroup, res *ResultT) {
 		return
 	}
 	const amountOfWorkPerHour = 3
-	activTicets := 0
+	activTickets := 0
 	load := 1
 	for _, v := range c.support.Data {
-		activTicets += v.ActiveTickets
+		activTickets += v.ActiveTickets
 	}
 
-	if 9 <= activTicets && activTicets <= 16 {
+	if 9 <= activTickets && activTickets <= 16 {
 		load = 2
 	}
-	if activTicets > 16 {
+	if activTickets > 16 {
 		load = 3
 	}
 	res.Data.Support[0] = load
-	waitingTime := activTicets * amountOfWorkPerHour
+	waitingTime := activTickets * amountOfWorkPerHour
 	res.Data.Support[1] = waitingTime
 	return
 }
