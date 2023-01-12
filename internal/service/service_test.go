@@ -39,6 +39,17 @@ func Test_collector_GetSystemData(t *testing.T) {
 	}))
 	defer serverIncident.Close()
 
+	serverSupport := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		w.WriteHeader(http.StatusOK)
+		content, err := os.ReadFile("../adapter/support/support_data.json")
+		assert.Nil(t, err)
+		_, _ = w.Write(content)
+	}))
+	defer serverSupport.Close()
+
 	tests := []struct {
 		name    string
 		want    ResultT
@@ -193,7 +204,10 @@ func Test_collector_GetSystemData(t *testing.T) {
 						FraudControl:   true,
 						CheckoutPage:   false,
 					},
-					Support: []int(nil),
+					Support: []int{
+						2,
+						36,
+					},
 					Incidents: []incident.IncidentData{
 						{
 							Topic:  "Wrong SMS delivery time",
@@ -215,7 +229,7 @@ func Test_collector_GetSystemData(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := New("../adapter/sms/test_sms.data", serverMms.URL, "../adapter/voiceCall/test_voice_call.data", "../adapter/email/test_email.data", "../adapter/billing/billing_data_test.txt", serverIncident.URL)
+			c := New("../adapter/sms/test_sms.data", serverMms.URL, "../adapter/voiceCall/test_voice_call.data", "../adapter/email/test_email.data", "../adapter/billing/billing_data_test.txt", serverIncident.URL, serverSupport.URL)
 			got := c.GetSystemData()
 
 			assert.Equal(t, tt.want, got)
