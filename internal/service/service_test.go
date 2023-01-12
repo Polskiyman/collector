@@ -44,7 +44,7 @@ func Test_collector_GetSystemData(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 
 		w.WriteHeader(http.StatusOK)
-		content, err := os.ReadFile("../adapter/incident/incident_data.json")
+		content, err := os.ReadFile("../adapter/support/support_data.json")
 		assert.Nil(t, err)
 		_, _ = w.Write(content)
 	}))
@@ -204,7 +204,10 @@ func Test_collector_GetSystemData(t *testing.T) {
 						FraudControl:   true,
 						CheckoutPage:   false,
 					},
-					Support: []int{},
+					Support: []int{
+						2,
+						36,
+					},
 					Incidents: []incident.IncidentData{
 						{
 							Topic:  "Wrong SMS delivery time",
