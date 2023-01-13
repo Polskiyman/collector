@@ -1,4 +1,4 @@
-package pkg
+package config
 
 import (
 	"encoding/json"
@@ -6,7 +6,11 @@ import (
 )
 
 type Config struct {
-	UrlService    string `json:"Url_service"`
+	AppUrl   string   `json:"app_url"`
+	Adapters Adapters `json:"adapters"`
+}
+
+type Adapters struct {
 	SmsPath       string `json:"sms_path"`
 	MmsUrl        string `json:"mms_url"`
 	VoiceCallPath string `json:"voice_call_path"`

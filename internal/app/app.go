@@ -1,7 +1,6 @@
 package app
 
 import (
-	"collector/pkg"
 	"fmt"
 	"net/http"
 
@@ -9,6 +8,7 @@ import (
 
 	"collector/internal/controller"
 	"collector/internal/service"
+	"collector/pkg/config"
 )
 
 type App struct {
@@ -17,11 +17,11 @@ type App struct {
 	Service service.CollectorInterface
 }
 
-func NewApp(conf pkg.Config) *App {
+func NewApp(conf config.Config) *App {
 	return &App{
-		Url:     conf.UrlService,
+		Url:     conf.AppUrl,
 		Router:  mux.NewRouter(),
-		Service: service.New(conf),
+		Service: service.New(conf.Adapters),
 	}
 }
 

@@ -4,13 +4,13 @@ import (
 	"log"
 
 	"collector/internal/app"
-	"collector/pkg"
+	"collector/pkg/config"
 )
 
 const configPath = "config.json"
 
 func main() {
-	config, err := pkg.ParseFromFile(configPath)
+	config, err := config.ParseFromFile(configPath)
 	if err != nil {
 		log.Fatal(err)
 	}

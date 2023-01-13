@@ -14,6 +14,7 @@ import (
 	"collector/internal/adapter/mms"
 	"collector/internal/adapter/sms"
 	"collector/internal/adapter/voiceCall"
+	"collector/pkg/config"
 )
 
 func Test_collector_GetSystemData(t *testing.T) {
@@ -58,7 +59,7 @@ func Test_collector_GetSystemData(t *testing.T) {
 		{name: "simple test",
 			want: ResultT{
 				Status: true,
-				Data: ResultSetT{
+				Data: &ResultSetT{
 					SMS: [][]sms.SMSData{
 						[]sms.SMSData{
 							sms.SMSData{
@@ -229,7 +230,16 @@ func Test_collector_GetSystemData(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := New("../adapter/sms/test_sms.data", serverMms.URL, "../adapter/voiceCall/test_voice_call.data", "../adapter/email/test_email.data", "../adapter/billing/billing_data_test.txt", serverIncident.URL, serverSupport.URL)
+			cfg := config.Adapters{
+				SmsPath:       "../adapter/sms/test_sms.data",
+				MmsUrl:        serverMms.URL,
+				VoiceCallPath: "../adapter/voiceCall/test_voice_call.data",
+				EmailPath:     "../adapter/email/test_email.data",
+				BillingPath:   "../adapter/billing/billing_data_test.txt",
+				IncidentUrl:   serverIncident.URL,
+				SupportUrl:    serverSupport.URL,
+			}
+			c := New(cfg)
 			got := c.GetSystemData()
 
 			assert.Equal(t, tt.want, got)

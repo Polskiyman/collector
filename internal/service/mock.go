@@ -14,7 +14,7 @@ type Mock struct{}
 func (Mock) GetSystemData() (res ResultT) {
 	return ResultT{
 		Status: true,
-		Data: ResultSetT{
+		Data: &ResultSetT{
 			SMS: [][]sms.SMSData{
 				[]sms.SMSData{
 					sms.SMSData{
