@@ -1,11 +1,11 @@
 {
   "app_url": "127.0.0.1:8382",
   "adapters": {
-    "sms_path": "C:/Users/User/go/src/skillbox-diploma/sms.data",
+    "sms_path": "../skillbox-diploma/sms.data",
     "mms_url": "http://127.0.0.1:8383/mms",
-    "voice_call_path": "C:/Users/User/go/src/skillbox-diploma/voice.data",
-    "email_path": "C:/Users/User/go/src/skillbox-diploma/email.data",
-    "billing_path": "C:/Users/User/go/src/skillbox-diploma/billing.data",
+    "voice_call_path": "../skillbox-diploma/voice.data",
+    "email_path": "../skillbox-diploma/email.data",
+    "billing_path": "../skillbox-diploma/billing.data",
     "incident_url": "http://127.0.0.1:8383/accendent",
     "support_url": "http://127.0.0.1:8383/support"
   }
