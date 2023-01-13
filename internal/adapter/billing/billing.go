@@ -8,7 +8,7 @@ import (
 var (
 	one           = uint8('1')
 	errBadPath    = fmt.Errorf("bad file path")
-	errLenBilling = fmt.Errorf("billing file does not contains 8 bits")
+	errLenBilling = fmt.Errorf("billing file does not contains 6 bits")
 )
 
 type Billing struct {
@@ -40,15 +40,15 @@ func (b *Billing) Parse() error {
 	}
 
 	s := string(content)
-	if len(s) != 8 {
+	if len(s) != 6 {
 		err = errLenBilling
 		return err
 	}
-	b.Data.CheckoutPage = s[2] == one
-	b.Data.FraudControl = s[3] == one
-	b.Data.Recurring = s[4] == one
-	b.Data.Payout = s[5] == one
-	b.Data.Purchase = s[6] == one
-	b.Data.CreateCustomer = s[7] == one
+	b.Data.CheckoutPage = s[0] == one
+	b.Data.FraudControl = s[1] == one
+	b.Data.Recurring = s[2] == one
+	b.Data.Payout = s[3] == one
+	b.Data.Purchase = s[4] == one
+	b.Data.CreateCustomer = s[5] == one
 	return nil
 }
