@@ -11,17 +11,18 @@ import (
 	"collector/internal/adapter/sms"
 	"collector/internal/adapter/support"
 	"collector/internal/adapter/voiceCall"
+	"collector/pkg/config"
 	"collector/pkg/country"
 )
 
 type CollectorInterface interface {
-	GetSystemData() (string, error)
+	GetSystemData() (res ResultT)
 }
 
 type ResultT struct {
-	Status bool       `json:"status"` // true, если все этапы сбора данных прошли успешно, false во всех остальных случаях
-	Data   ResultSetT `json:"data"`   // заполнен, если все этапы сбора данных прошли успешно, nil во всех остальных случаях
-	Error  string     `json:"error"`  // пустая строка если все этапы сбора данных прошли успешно, в случае ошибки заполнено текстом ошибки (детали ниже)
+	Status bool        `json:"status"` // true, если все этапы сбора данных прошли успешно, false во всех остальных случаях
+	Data   *ResultSetT `json:"data"`   // заполнен, если все этапы сбора данных прошли успешно, nil во всех остальных случаях
+	Error  string      `json:"error"`  // пустая строка если все этапы сбора данных прошли успешно, в случае ошибки заполнено текстом ошибки (детали ниже)
 	sync.Mutex
 }
 
@@ -52,20 +53,20 @@ type Collector struct {
 	support   *support.Support
 }
 
-func New(smsPath, mmsUrl, viceCallPath, emailPath, billingPath, incidentData, supportPath string) *Collector {
+func New(config config.Adapters) *Collector {
 	return &Collector{
-		sms:       sms.New(smsPath),
-		mms:       mms.New(mmsUrl),
-		voiceCall: voiceCall.New(viceCallPath),
-		email:     email.New(emailPath),
-		billing:   billing.New(billingPath),
-		incident:  incident.New(incidentData),
-		support:   support.New(supportPath),
+		sms:       sms.New(config.SmsPath),
+		mms:       mms.New(config.MmsUrl),
+		voiceCall: voiceCall.New(config.VoiceCallPath),
+		email:     email.New(config.EmailPath),
+		billing:   billing.New(config.BillingPath),
+		incident:  incident.New(config.IncidentUrl),
+		support:   support.New(config.SupportUrl),
 	}
 }
 
 func (c *Collector) GetSystemData() (res ResultT) {
-	res.Data = ResultSetT{
+	res.Data = &ResultSetT{
 		SMS:       make([][]sms.SMSData, 2, 2),
 		MMS:       make([][]mms.MmsData, 2, 2),
 		VoiceCall: make([]voiceCall.VoiceCallData, 0),
@@ -79,27 +80,23 @@ func (c *Collector) GetSystemData() (res ResultT) {
 	res.Status = true
 
 	go c.getSmsData(&wg, &res)
-
 	go c.getMmsData(&wg, &res)
-
 	go c.getVoiceCallData(&wg, &res)
-
 	go c.getEmailData(&wg, &res)
-
 	go c.getBillingData(&wg, &res)
-
 	go c.getIncidentData(&wg, &res)
-
 	go c.getSupportData(&wg, &res)
 
 	wg.Wait()
+	if !res.Status {
+		res.Data = nil
+	}
 
 	return
 }
 
 func (c *Collector) getSmsData(wg *sync.WaitGroup, res *ResultT) {
 	defer wg.Done()
-
 	if !res.Status {
 		return
 	}
@@ -129,7 +126,6 @@ func (c *Collector) getSmsData(wg *sync.WaitGroup, res *ResultT) {
 
 func (c *Collector) getMmsData(wg *sync.WaitGroup, res *ResultT) {
 	defer wg.Done()
-
 	if !res.Status {
 		return
 	}
@@ -159,7 +155,6 @@ func (c *Collector) getMmsData(wg *sync.WaitGroup, res *ResultT) {
 
 func (c *Collector) getVoiceCallData(wg *sync.WaitGroup, res *ResultT) {
 	defer wg.Done()
-
 	if !res.Status {
 		return
 	}
@@ -213,10 +208,10 @@ func (c *Collector) getEmailData(wg *sync.WaitGroup, res *ResultT) {
 
 func (c *Collector) getBillingData(wg *sync.WaitGroup, res *ResultT) {
 	defer wg.Done()
-
 	if !res.Status {
 		return
 	}
+
 	err := c.billing.Parse()
 	if err != nil {
 		res.statusError(err)
@@ -228,10 +223,10 @@ func (c *Collector) getBillingData(wg *sync.WaitGroup, res *ResultT) {
 
 func (c *Collector) getIncidentData(wg *sync.WaitGroup, res *ResultT) {
 	defer wg.Done()
-
 	if !res.Status {
 		return
 	}
+
 	err := c.incident.Fetch()
 	if err != nil {
 		res.statusError(err)
@@ -246,10 +241,10 @@ func (c *Collector) getIncidentData(wg *sync.WaitGroup, res *ResultT) {
 
 func (c *Collector) getSupportData(wg *sync.WaitGroup, res *ResultT) {
 	defer wg.Done()
-
 	if !res.Status {
 		return
 	}
+
 	err := c.support.Fetch()
 	if err != nil {
 		res.statusError(err)

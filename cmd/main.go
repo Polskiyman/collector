@@ -1,5 +1,20 @@
 package main
 
+import (
+	"log"
+
+	"collector/internal/app"
+	"collector/pkg/config"
+)
+
+const configPath = "config.json"
+
 func main() {
-	// TODO: create conf, app and run app
+	config, err := config.ParseFromFile(configPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	a := app.NewApp(config)
+	a.Run()
 }

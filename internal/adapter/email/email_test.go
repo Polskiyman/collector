@@ -17,14 +17,17 @@ func TestEmail_Parse(t *testing.T) {
 		wantErr  error
 	}{
 		{
-			name: "example from task",
+			name: "example",
 			path: "test_email.data",
 			wantData: []EmailData{
-				{
-					Country:      "AT",
-					Provider:     "Hotmail",
-					DeliveryTime: 487,
-				},
+				{Country: "RU", Provider: "Gmail", DeliveryTime: 428},
+				{Country: "RU", Provider: "Yahoo", DeliveryTime: 124},
+				{Country: "RU", Provider: "Hotmail", DeliveryTime: 592},
+				{Country: "RU", Provider: "MSN", DeliveryTime: 463},
+				{Country: "US", Provider: "Yahoo", DeliveryTime: 305},
+				{Country: "US", Provider: "Hotmail", DeliveryTime: 391},
+				{Country: "US", Provider: "MSN", DeliveryTime: 124},
+				{Country: "US", Provider: "Orange", DeliveryTime: 45},
 			},
 		},
 		{
